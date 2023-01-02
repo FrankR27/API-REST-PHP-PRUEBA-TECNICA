@@ -17,6 +17,7 @@ $app->getAll('contacts/');
 $app->getContact("contacts/{$params[1]}");
 $app->post('contacts/');
 $app->delete("contacts/{$params[1]}");
+$app->patch("contacts/{$params[1]}");
 
 // Error 404
 echo json_encode(ResponseHttp::status404());

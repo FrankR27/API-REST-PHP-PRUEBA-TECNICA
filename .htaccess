@@ -6,3 +6,6 @@ Options All -Indexes
 order allow,deny
 deny from all
 </files>
+
+#URL amigables con un solo parametro
+RewriteRule ^([0-9a-zA-Z-@./]+)$ index.php?route=$1 [QSA]

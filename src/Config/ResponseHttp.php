@@ -9,23 +9,20 @@ class ResponseHttp
     );
 
     // Cabeceras HTTP para el modo de desarrollo
-    final public static function headerHttp($method) {
-
-        // Si el método es OPTIONS, salimos
-        if($method == 'OPTIONS') {
-            exit(0);
-        }
-
-        // Establecemos las cabeceras
+    final public static function headerHttp($method)
+    {
         header('Access-Control-Allow-Origin: *');
-        header('Access-Control-Allow-Methods: GET, POST, DELETE');
-        header('Allow: GET, POST, DELETE, OPTIONS');
-        header('Access-Control-Allow-Headers: Origin, X-Requested-With, Content-Type, Accept');
-        header('Content-Type: application/json');
+        header("Access-Control-Allow-Headers: X-API-KEY, Origin, X-Requested-With, Content-Type, Accept, Access-Control-Request-Method");
+        header("Access-Control-Allow-Methods: GET, POST, OPTIONS, PUT, DELETE");
+        header("Allow: GET, POST, OPTIONS, PUT, DELETE");
+        $method = $_SERVER['REQUEST_METHOD'];
+        if ($method == "OPTIONS") {
+            die();
+        }
     }
 
     // Métodos para establecer el código de respuesta HTTP
-    
+
     final public static function status200(string $res = 'OK')
     {
         http_response_code(200);

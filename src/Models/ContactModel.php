@@ -70,8 +70,7 @@ class ContactModel extends ConnectionDataBase {
             $con = self::getConnection();
             $query = $con->prepare('SELECT * FROM contacts');
             $query->execute();
-            $rs['data'] = $query->fetchAll(\PDO::FETCH_ASSOC);
-            return $rs;
+            return $query->fetchAll(\PDO::FETCH_ASSOC);
         } catch (\PDOException $e) {
             error_log('ContactModel::getAll: ' . $e->getMessage());
             die(json_encode(ResponseHttp::status500()));
@@ -87,8 +86,7 @@ class ContactModel extends ConnectionDataBase {
 
             // Se verifica si existe el contacto
             if($query->rowCount() > 0) {
-                $rs['data'] = $query->fetchAll(\PDO::FETCH_ASSOC);
-                return $rs;
+                return $query->fetch(\PDO::FETCH_ASSOC);
             } else {
                 return ResponseHttp::status404('El contacto no existe');
             }
@@ -113,6 +111,31 @@ class ContactModel extends ConnectionDataBase {
             }
         } catch (\PDOException $e) {
             error_log('ContactModel::delete: ' . $e->getMessage());
+            die(json_encode(ResponseHttp::status500()));
+        }
+    }
+
+    // Método para actualizar un contacto
+    public static function patch(int $id, array $data) {
+        try {
+            $con = self::getConnection();
+            $query = $con->prepare('UPDATE contacts SET name = :name, lastname = :lastname, email = :email, phone = :phone WHERE id_contact = :id_contact');
+            $query->execute([
+                ':name' => $data['name'],
+                ':lastname' => $data['lastname'],
+                ':email' => $data['email'],
+                ':phone' => $data['phone'],
+                ':id_contact' => $id
+            ]);
+
+            // Se verifica si se actualizo el contacto
+            if($query->rowCount() > 0) {
+                return ResponseHttp::status200('Contacto actualizado exitosamente');
+            } else {
+                return ResponseHttp::status404('El contacto no existe');
+            }
+        } catch (\PDOException $e) {
+            error_log('ContactModel::patch: ' . $e->getMessage());
             die(json_encode(ResponseHttp::status500()));
         }
     }

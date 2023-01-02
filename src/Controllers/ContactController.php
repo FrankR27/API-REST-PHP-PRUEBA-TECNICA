@@ -9,8 +9,8 @@ class ContactController
 {
 
     // Expresiones regulares
-    private static $validate_text = '/^[a-zA-Z]+$/';
-    private static $validate_phone = '/^[0-9]{10}$/';
+    private static $validate_text = '/^[a-zA-ZáéíóúÁÉÍÓÚñÑ ]+$/';
+    private static $validate_phone = '/^\(?(\d{3})\)?[- ]?(\d{3})[- ]?(\d{4})$/';
     private static $validate_number = '/^[0-9]+$/';
 
     public function __construct(
@@ -77,6 +77,31 @@ class ContactController
                 echo json_encode(ResponseHttp::status400('El id debe ser un número'));
             } else {
                 echo json_encode(ContactModel::delete($id));
+                exit;
+            }
+            exit;
+        }
+    }
+
+
+    final public function patch(string $endPoint)
+    {
+        if ($this->method == 'patch' && $endPoint == $this->route) {
+            $id = $this->params[1];
+            if (!isset($id)) {
+                echo json_encode(ResponseHttp::status400('El id es requerido'));
+            } else if (!preg_match(self::$validate_number, $id)) {
+                echo json_encode(ResponseHttp::status400('El id debe ser un número'));
+            } else if (empty($this->data['name']) || empty($this->data['lastname']) || empty($this->data['email']) || empty($this->data['phone'])) {
+                echo json_encode(ResponseHttp::status400('Todos los campos son requeridos'));
+            } else if (!preg_match(self::$validate_text, $this->data['name']) || !preg_match(self::$validate_text, $this->data['lastname'])) {
+                echo json_encode(ResponseHttp::status400('El nombre y apellido solo pueden contener letras'));
+            } else if (!filter_var($this->data['email'], FILTER_VALIDATE_EMAIL)) {
+                echo json_encode(ResponseHttp::status400('El email no es válido'));
+            } else if (!preg_match(self::$validate_phone, $this->data['phone'])) {
+                echo json_encode(ResponseHttp::status400('El telefono no es válido, Ej: 8092371111'));
+            } else {
+                echo json_encode(ContactModel::patch($id, $this->data));
                 exit;
             }
             exit;
